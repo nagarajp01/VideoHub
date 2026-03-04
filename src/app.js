@@ -14,4 +14,36 @@ app.use(express.static("public"));
 app.use(cookieParser())
 
 
+// app.use((err,req,res,next)=>{
+//     const statusCode=err.statusCode || 500;
+//     const message=err.message || "Something went wrong";
+//     return res.status(statusCode).json({
+//         success:false,
+//         statusCode,
+//         message,
+//         errors:err.errors || [],
+//     })
+// })
+
+
+//routers import
+import userRouter from "./routes/user.routes.js"
+
+app.use("/api/v1/users",userRouter)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export {app}

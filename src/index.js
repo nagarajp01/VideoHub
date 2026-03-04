@@ -10,9 +10,11 @@ dotenv.config({
     path:"./.env"
 })
 
+const PORT=process.env.PORT || 8000;
+
 dataBaseConnect().then(()=>{
     app.on("error",(error)=>{console.log("express Error",error); throw error;})
-    app.listen(process.env.PORT || 8000,()=>{
+    app.listen(PORT, ()=>{
         console.log(`Server Started and running at ${process.env.PORT}`)
     })
 }).catch((error)=>{
