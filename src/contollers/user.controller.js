@@ -5,7 +5,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
 import { v2 as cloudinary } from 'cloudinary';
-import { Subscription } from "../models/subscription.model.js"
+// import { Subscription } from "../models/subscription.model.js"
 import mongoose from "mongoose"
 
 const generateAccessAndRefreshToken=async(userId)=>{
@@ -222,7 +222,7 @@ const updateUserAvatar=asyncHandler(async(req,res)=>{
     if(!cloudImage.url){
         throw new ApiError(400,"Image Upload Failed...")
     }
-    const oldCloudimage=await cloudinary.uploader.destroy(oldAvatarPublic_id)
+    await cloudinary.uploader.destroy(oldAvatarPublic_id)
     const user=await User.findByIdAndUpdate(req.user?._id,{
         $set:{
             avatar:cloudImage.url
@@ -301,7 +301,7 @@ const getChannelProfile=asyncHandler(async(req,res)=>{
                 },
                 isSubscribed:{
                     $cond:{
-                        if:{$in:[req.user?._id,"$subscribers.subscriber"]},
+                        if:{$in:[new mongoose.Types.ObjectId(req.user?._id),"$subscribers.subscriber"]},
                         then:true,
                         else:false
                     }
