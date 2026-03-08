@@ -247,7 +247,9 @@ const updateUserCoverImage=asyncHandler(async(req,res)=>{
     if(!cloudImage.url){
         throw new ApiError(400,"Image Upload Failed...")
     }
-    const oldCoverImage=await cloudinary.uploader.destroy(oldCoverPublic_id)
+   if(oldCoverPublic_id){
+     await cloudinary.uploader.destroy(oldCoverPublic_id)
+   }
     const user=await User.findByIdAndUpdate(req.user?._id,{
         $set:{
             coverImage:cloudImage.url
@@ -276,7 +278,7 @@ const getChannelProfile=asyncHandler(async(req,res)=>{
             },
             {
                 $lookup:{
-                    from:"subsciptions",
+                    from:"subscriptions",
                     localField:"_id",
                     foreignField:"Channel",
                     as:"subscribers"
@@ -301,7 +303,7 @@ const getChannelProfile=asyncHandler(async(req,res)=>{
                 },
                 isSubscribed:{
                     $cond:{
-                        if:{$in:[new mongoose.Types.ObjectId(req.user?._id),"$subscribers.subscriber"]},
+                        if:{$in:[new mongoose.Types.ObjectId(req.user?._id),"$subscribers.Subscriber"]},
                         then:true,
                         else:false
                     }

@@ -1,11 +1,11 @@
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import {User} from "../models/user.model"
-import { Video } from "../models/video.model";
-import { asyncHandler } from "../utils/asyncHandler";
-import { uploadInCloudinary } from "../utils/cloudinary";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import {User} from "../models/user.model.js"
+import { Video } from "../models/video.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { uploadInCloudinary } from "../utils/cloudinary.js";
 import { v2 as cloudinary } from 'cloudinary';
-import { json } from "express";
+// import { json } from "express";
 
 
 const getAllvideos=asyncHandler(async(req,res)=>{
@@ -118,21 +118,25 @@ const updateVideo =asyncHandler(async(req,res)=>{
         throw new ApiError(400,"above fields must required to update")
     }
     const thumbnailPath=req.file?.path
-    if(!thumbnailPath){
-        throw new ApiError(400,"thumbnail not found");
-    }
-    //    const fetchVideo=await Video.findById(videoId)
-       const oldThumnailPublic_id=video.thumbnail.split("/").pop().split(".")[0]
-    const updateThumbnailCloud=await uploadInCloudinary(thumbnailPath);
-    if(!updateThumbnailCloud){
+    let thumbnailUrl
+    if(thumbnailPath){
+        // throw new ApiError(400,"thumbnail not found");
+        const oldThumnailPublic_id=video.thumbnail.split("/").pop().split(".")[0]
+        const updateThumbnailCloud=await uploadInCloudinary(thumbnailPath);
+            if(!updateThumbnailCloud){
         throw new ApiError(400,"thumnail update failed...")
     }
     await cloudinary.uploader.destroy(oldThumnailPublic_id)
+    thumbnailUrl=updateThumbnailCloud.url
+
+    }
+    
     const videoUpdate=await Video.findByIdAndUpdate(videoId,{
         $set:{
             title:title,
             description:description,
-            thumbnail:updateThumbnailCloud.url
+            ...(thumbnailUrl && {thumbnail : thumbnailUrl})
+            // thumbnail:updateThumbnailCloud.url
         }
     },{
         new:true
@@ -164,7 +168,9 @@ const deleteVideo =asyncHandler(async(req,res)=>{
     if(!oldVideo){
         throw new ApiError(400,"old video file is missing")
     }
-    await cloudinary.uploader.destroy(oldVideo)
+    await cloudinary.uploader.destroy(oldVideo,{
+        resource_type:"video"
+    })
     await Video.findByIdAndDelete(videoId)
 
     return res.status(200).json(
