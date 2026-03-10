@@ -1,8 +1,8 @@
 import { isValidObjectId } from "mongoose";
-import { Tweet } from "../models/tweet.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
+import { Tweet } from "../models/tweet.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 
@@ -41,12 +41,12 @@ const getUserTweets=asyncHandler(async(req,res)=>{
 
 
 const updateTweet= asyncHandler(async(req,res)=>{
-    const { newContent }=req.body
+    const { content }=req.body
     const { tweetId }=req.params
     if(!tweetId){
         throw new ApiError(400,"tweet not found")
     }
-    if(!newContent){
+    if(!content){
         throw new ApiError(400,"please enter the tweet first")
     }
     const tweet= await Tweet.findById(tweetId)
@@ -56,7 +56,7 @@ const updateTweet= asyncHandler(async(req,res)=>{
 
     const updatedTweet=await Tweet.findByIdAndUpdate(tweetId,{
         $set:{
-            content:newContent
+            content:content
         }
     },{new:true})
 
@@ -78,21 +78,9 @@ const deleteTweet=asyncHandler(async(req,res)=>{
 
     const deletedTweet=await Tweet.findByIdAndDelete(tweetId)
     return res.status(200).json(
-        new ApiResponse(200,deletedTweet,"tweet deleted successfully")
+        new ApiResponse(200,{},"tweet deleted successfully")
     )
 })
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 export {createTweet , getUserTweets,updateTweet,deleteTweet}
