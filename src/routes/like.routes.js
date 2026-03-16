@@ -1,7 +1,7 @@
 import Router from "express"
 
 import verifyJwt from "../middlewares/auth.middleware"
-import { getLikedVideos, toggleCommentLike, toggleTweetLike, toggleVideoLike } from "../contollers/like.controller"
+import { getLikedVideos, toggleCommentLike, toggleTweetLike, toggleVideoLike } from "../controllers/like.controller"
 
 const router=Router()
 
