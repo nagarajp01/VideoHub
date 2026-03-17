@@ -1,7 +1,7 @@
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { asyncHandler } from "../utils/asyncHandler";
-import { Comment } from "../models/comment.model";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { Comment } from "../models/comment.model.js";
 import { isValidObjectId } from "mongoose";
 
 
@@ -36,7 +36,7 @@ const addComment=asyncHandler(async(req,res)=>{
 
     })
     return res.status(200).json(
-        new ApiResponse(200,"comment posted successfully")
+        new ApiResponse(200,newComment,"comment posted successfully")
     )
 })
 
@@ -52,10 +52,13 @@ const updateComment=asyncHandler(async(req,res)=>{
         throw new ApiError(400,"content is required")
     }
     const comment=await Comment.findById(commentId)
+    if(!comment){
+        throw new ApiError(404,"comment not found")
+    }
     if(!comment.owner.equals(req.user._id)){
         throw new ApiError(404,"you dont have access")
     }
-    const updateComment=await Comment.findByIdAndUpdate(commentId,{
+    const updatedComment=await Comment.findByIdAndUpdate(commentId,{
         $set:{
             content:content
         }
@@ -63,7 +66,7 @@ const updateComment=asyncHandler(async(req,res)=>{
         new:true
     })
 
-    return res.status(200).json(new ApiResponse(200,updateComment,"comment updated successfullyy"))
+    return res.status(200).json(new ApiResponse(200,updatedComment,"comment updated successfullyy"))
 
 })
 

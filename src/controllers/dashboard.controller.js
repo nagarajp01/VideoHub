@@ -58,7 +58,7 @@ return res.status(200).json(
         totalVideos:videoStats[0].totalVideos,
         totalViews:videoStats[0].totalViews,
         totalLikes:totalLikes,
-        totalSubscribers:subscribers[0]
+        totalSubscribers:subscribers[0]?.totalSubscribers || 0
     })
 )
 
